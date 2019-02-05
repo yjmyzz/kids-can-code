@@ -1,5 +1,5 @@
 # https://opengameart.org/content/jumper-pack
-from part_10.settings import *
+from part_12.settings import *
 import pygame as pg
 import math
 from xml.dom.minidom import parse
@@ -56,6 +56,9 @@ class Player(pg.sprite.Sprite):
         self.vel += self.acc
         self.pos += self.vel
 
+        if abs(self.vel.x) < 0.5:
+            self.vel.x = 0
+
         if self.rect.left > WIDTH:
             self.pos.x = 0 - self.width / 2
         if self.rect.right < 0:
@@ -68,6 +71,23 @@ class Player(pg.sprite.Sprite):
 
     def animate(self):
         now = pg.time.get_ticks()
+        if self.vel.x != 0:
+            self.walking = True
+        else:
+            self.walking = False
+
+        if self.walking:
+            if now - self.last_update > 150:
+                self.last_update = now
+                self.current_frame += 1
+                bottom = self.rect.bottom
+                if self.vel.x < 0:
+                    self.image = self.walking_frames_left[self.current_frame % len(self.walking_frames_left)]
+                elif self.vel.x > 0:
+                    self.image = self.walking_frames_right[self.current_frame % len(self.walking_frames_right)]
+                self.rect = self.image.get_rect()
+                self.rect.bottom = bottom
+
         if not self.jumping and not self.walking:
             if now - self.last_update > 200:
                 self.last_update = now
@@ -79,8 +99,9 @@ class Player(pg.sprite.Sprite):
 
 
 class Platform(pg.sprite.Sprite):
-    def __init__(self, x, y, w, h):
+    def __init__(self, game, x, y, w, h):
         pg.sprite.Sprite.__init__(self)
+        self.game = game
         self.image = pg.Surface((w, h))
         self.image.fill(GREEN)
         self.rect = self.image.get_rect()

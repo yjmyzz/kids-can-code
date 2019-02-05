@@ -12,7 +12,7 @@ PLAYER_GRAVITY = 1.2
 PLAYER_FRICTION = -0.06
 PLAYER_JUMP = 20
 FONT_NAME = "Menlo"
-HIGH_SCORE_FILE = "high_score.txt";
+HIGH_SCORE_FILE = "../data/high_score.txt"
 
 # starting platform
 PLATFORM_LIST = [(0, HEIGHT - 30, WIDTH, 30),

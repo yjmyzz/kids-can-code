@@ -1,6 +1,7 @@
-from part_07.sprites import *
-from part_07.settings import *
+from part_12.sprites import *
+from part_12.settings import *
 import random
+from os import path
 
 
 class Game:
@@ -14,6 +15,23 @@ class Game:
         self.running = True
         self.playing = False
         self.font_name = FONT_NAME
+        self.high_score = 0
+        self.score = 0
+        self.dir = path.dirname(__file__)
+        self.load_data()
+
+    def load_data(self):
+        # 加载历史最高分
+        file_path = path.join(self.dir, HIGH_SCORE_FILE)
+        if path.exists(file_path):
+            with open(file_path, "r") as f:
+                try:
+                    self.high_score = int(f.read())
+                except:
+                    self.high_score = 0
+        # load spritesheet
+        self.spritesheet = Spritesheet(path.join(self.dir, SPRITE_SHEET_PNG_FILE),
+                                       path.join(self.dir, SPRITE_SHEET_XML_FILE))
 
     def new(self):
         self.score = 0
@@ -52,14 +70,11 @@ class Game:
                     plat.kill()
                     # 得分+10
                     self.score += 10
-        # 如果方块跌落到屏幕之外
         if self.player.rect.bottom > HEIGHT:
-            # 为了让体验更好，整个屏幕上滚，然后将所有方块干掉
             for sprite in self.all_sprites:
                 sprite.rect.top -= max(self.player.vel.y, 5)
                 if sprite.rect.bottom < 0:
                     sprite.kill()
-            # 如果1个档板都没有了，游戏结束，然后run()本次运行结束，下一轮主循环进来时，new()重新初始化，所有sprite实例重新初始化，满血复活
             if len(self.platforms) <= 0:
                 self.playing = False
 
@@ -108,19 +123,12 @@ class Game:
         self.draw_text(TITLE, 48, WHITE, WIDTH / 2, HEIGHT * 0.4)
         self.draw_text("Arrows to move, Space to jump", 22, WHITE, WIDTH / 2, HEIGHT * 0.55)
         self.draw_text("Press a key to play", 20, WHITE, WIDTH / 2, HEIGHT * 0.7)
-        pg.display.update()
-        self.wait_for_key()
-
-    def show_go_screen(self):
-        self.screen.fill(BG_COLOR)
-        self.draw_text("GAME OVER", 48, WHITE, WIDTH / 2, HEIGHT * 0.4)
-        self.draw_text("Score:  " + str(self.score), 22, WHITE, WIDTH / 2, HEIGHT * 0.55)
-        self.draw_text("Press a key to play again", 20, WHITE, WIDTH / 2, HEIGHT * 0.7)
+        self.draw_text("High Score: " + str(self.high_score), 20, WHITE, WIDTH / 2, 15)
         pg.display.update()
         self.wait_for_key()
 
     def draw(self):
-        self.screen.fill(BLACK)
+        self.screen.fill(LIGHT_BLUE)
         self.all_sprites.draw(self.screen)
         self.debug()
         self.draw_text(str(self.score), 22, WHITE, WIDTH / 2, 15)
@@ -137,7 +145,22 @@ class Game:
                 if event.type == pg.KEYUP:
                     waiting = False
 
+    def show_go_screen(self):
+        self.screen.fill(BG_COLOR)
+        self.draw_text("GAME OVER", 48, WHITE, WIDTH / 2, HEIGHT * 0.4)
+        self.draw_text("Score:  " + str(self.score), 22, WHITE, WIDTH / 2, HEIGHT * 0.55)
+        self.draw_text("Press a key to play again", 20, WHITE, WIDTH / 2, HEIGHT * 0.7)
+        # 如果得分出现新记录，保存下来
+        if self.score > self.high_score:
+            self.high_score = self.score
+            self.draw_text("New High Score: " + str(self.high_score), 28, WHITE, WIDTH / 2, 25)
+            with open(path.join(self.dir, HIGH_SCORE_FILE), "w") as f:
+                f.write(str(self.high_score))
+        else:
+            self.draw_text("High Score: " + str(self.high_score), 20, WHITE, WIDTH / 2, 15)
 
+        pg.display.update()
+        self.wait_for_key()
 
     def draw_text(self, text, size, color, x, y):
         font = pg.font.SysFont(self.font_name, size)
