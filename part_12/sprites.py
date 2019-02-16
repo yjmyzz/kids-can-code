@@ -3,6 +3,7 @@ from part_12.settings import *
 import pygame as pg
 import math
 from xml.dom.minidom import parse
+import random
 
 vec = pg.math.Vector2
 
@@ -99,11 +100,12 @@ class Player(pg.sprite.Sprite):
 
 
 class Platform(pg.sprite.Sprite):
-    def __init__(self, game, x, y, w, h):
+    def __init__(self, game, x, y):
         pg.sprite.Sprite.__init__(self)
         self.game = game
-        self.image = pg.Surface((w, h))
-        self.image.fill(GREEN)
+        images = [self.game.spritesheet.get_image("ground_grass_broken.png"),
+                  self.game.spritesheet.get_image("ground_grass_small_broken.png")]
+        self.image = random.choice(images)
         self.rect = self.image.get_rect()
         self.rect.x = x
         self.rect.y = y
