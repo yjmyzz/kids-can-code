@@ -42,6 +42,8 @@ class Game:
 
         for plat in PLATFORM_LIST:
             p = Platform(self, *plat)
+            if p.rect.right >= WIDTH:
+                p.rect.centerx = p.rect.centerx - (p.rect.right - WIDTH) - 2
             self.all_sprites.add(p)
             self.platforms.add(p)
 
@@ -70,6 +72,7 @@ class Game:
                     plat.kill()
                     # 得分+10
                     self.score += 10
+
         if self.player.rect.bottom > HEIGHT:
             for sprite in self.all_sprites:
                 sprite.rect.top -= max(self.player.vel.y, 5)
@@ -78,12 +81,18 @@ class Game:
             if len(self.platforms) <= 0:
                 self.playing = False
 
-        while len(self.platforms) <= 5:
+        while len(self.platforms) <= 5 and self.player.rect.bottom < HEIGHT:
             width = random.randrange(50, 100)
             p = Platform(self, random.randint(0, WIDTH - width),
                          random.randint(-70, -30))
-            self.platforms.add(p)
+            if p.rect.right >= WIDTH:
+                p.rect.centerx = p.rect.centerx - (p.rect.right - WIDTH) - 2
             self.all_sprites.add(p)
+            hits = pg.sprite.spritecollide(p, self.platforms, False)
+            if hits:
+                p.kill()
+            else:
+                self.platforms.add(p)
 
     def events(self):
         for event in pg.event.get():

@@ -3,7 +3,7 @@ from os import path
 from xml.dom.minidom import parse
 
 # 游戏中的一些常量定义
-SIZE = (WIDTH, HEIGHT) = (400, 400)
+SIZE = (WIDTH, HEIGHT) = (380, 380)
 FPS = 10
 
 # 颜色常量定义
@@ -29,6 +29,7 @@ sub_textures = root_textures.getElementsByTagName("SubTexture")
 dic_image = {}
 
 
+# 解析xml，找出指定图片的坐标、尺寸信息
 def get_image_rect(img_name):
     if dic_image.get(img_name):
         return dic_image[img_name]
@@ -44,6 +45,7 @@ def get_image_rect(img_name):
             return dic_image[img_name]
 
 
+# 获取指定图片的Surface对象，同时支持旋转+缩放
 def get_image(img_name, angle=0, scale=1.0):
     rect = get_image_rect(img_name);
     image = pygame.Surface((rect.width, rect.height))

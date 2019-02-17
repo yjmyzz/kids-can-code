@@ -15,9 +15,11 @@ class Game:
         self.running = True
         self.playing = False
         self.font_name = FONT_NAME
+        # 初始化最高得分
         self.high_score = 0
         self.score = 0
         self.dir = path.dirname(__file__)
+        # 加载历史最高得分
         self.load_data()
 
     def load_data(self):
@@ -113,6 +115,7 @@ class Game:
         self.draw_text(TITLE, 48, WHITE, WIDTH / 2, HEIGHT * 0.4)
         self.draw_text("Arrows to move, Space to jump", 22, WHITE, WIDTH / 2, HEIGHT * 0.55)
         self.draw_text("Press a key to play", 20, WHITE, WIDTH / 2, HEIGHT * 0.7)
+        # 显示最高得分
         self.draw_text("High Score: " + str(self.high_score), 20, WHITE, WIDTH / 2, 15)
         pg.display.update()
         self.wait_for_key()
