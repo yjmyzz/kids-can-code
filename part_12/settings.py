@@ -17,7 +17,7 @@ SPRITE_SHEET_PNG_FILE = "../img/spritesheet_jumper.png"
 SPRITE_SHEET_XML_FILE = "../img/spritesheet_jumper.xml"
 
 # starting platform
-PLATFORM_LIST = [(0, HEIGHT - 30),
+PLATFORM_LIST = [(5, HEIGHT - 35),
                  (WIDTH / 2 - 50, HEIGHT * 0.75),
                  (WIDTH * 0.12, HEIGHT * 0.5),
                  (WIDTH * 0.65, 200),

@@ -63,9 +63,9 @@ class Game:
                 self.player.pos.y = hits[0].rect.top
                 self.player.vel.y = 0
         if self.player.rect.top < HEIGHT / 4:
-            self.player.pos.y += abs(self.player.vel.y)
+            self.player.pos.y += max(abs(self.player.vel.y), 2)
             for plat in self.platforms:
-                plat.rect.top += abs(self.player.vel.y)
+                plat.rect.top += max(abs(self.player.vel.y), 2)
                 if plat.rect.top > HEIGHT:
                     plat.kill()
                     # 得分+10
@@ -79,7 +79,8 @@ class Game:
                 self.playing = False
 
         while len(self.platforms) <= 5:
-            p = Platform(self, random.randint(0, WIDTH),
+            width = random.randrange(50, 100)
+            p = Platform(self, random.randint(0, WIDTH - width),
                          random.randint(-70, -30))
             self.platforms.add(p)
             self.all_sprites.add(p)
@@ -93,13 +94,6 @@ class Game:
             if event.type == pg.KEYDOWN:
                 if event.key == pg.K_SPACE:
                     self.player.jump()
-
-    def draw(self):
-        self.screen.fill(LIGHT_BLUE)
-        self.all_sprites.draw(self.screen)
-        self.debug()
-        self.draw_text(str(self.score), 22, WHITE, WIDTH / 2, 15)
-        pg.display.update()
 
     def debug(self):
         if DEBUG:
@@ -130,7 +124,8 @@ class Game:
         self.all_sprites.draw(self.screen)
         self.debug()
         self.draw_text(str(self.score), 22, WHITE, WIDTH / 2, 15)
-        pg.display.flip()
+        self.screen.blit(self.player.image, self.player.rect)
+        pg.display.update()
 
     def wait_for_key(self):
         waiting = True

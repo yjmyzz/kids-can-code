@@ -93,13 +93,6 @@ class Game:
                 if event.key == pg.K_SPACE:
                     self.player.jump()
 
-    def draw(self):
-        self.screen.fill(LIGHT_BLUE)
-        self.all_sprites.draw(self.screen)
-        self.debug()
-        self.draw_text(str(self.score), 22, WHITE, WIDTH / 2, 15)
-        pg.display.update()
-
     def debug(self):
         if DEBUG:
             font = pg.font.SysFont(self.font_name, 25, True)

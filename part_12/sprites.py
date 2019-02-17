@@ -21,7 +21,7 @@ class Player(pg.sprite.Sprite):
         self.image = self.standing_frames[0]
 
         self.rect = self.image.get_rect()
-        self.rect.center = WIDTH / 2, HEIGHT / 2
+        self.rect.center = (35, HEIGHT - 35)
         self.pos = self.rect.center
         self.vel = vec(0, 0)
         self.acc = vec(0, 0)
@@ -113,7 +113,7 @@ class Platform(pg.sprite.Sprite):
 
 class Spritesheet:
     def __init__(self, png_file_name, xml_file_name):
-        self.sprite_sheet = pg.image.load(png_file_name)
+        self.sprite_sheet = pg.image.load(png_file_name).convert_alpha()
         self.sprite_sheet_dom_tree = parse(xml_file_name)
         self.dic_image = {}
         self.root_textures = self.sprite_sheet_dom_tree.documentElement
