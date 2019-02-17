@@ -65,8 +65,7 @@ class Game:
                 self.player.pos.y = hits[0].rect.top
                 self.player.vel.y = 0
         if self.player.rect.top < HEIGHT / 4:
-            # 如果player正好1/4高度位置的平台上，由于y轴速度为0，
-            # 如果头上的plat正好出现一半，视觉上看上去有点奇怪，所以调整成不低于2px的速度y，这样屏幕会缓缓滚动，直到把platform全露出来
+            # 防止垂直方向速度为0时，无法滚动屏幕
             self.player.pos.y += max(abs(self.player.vel.y), 2)
             for plat in self.platforms:
                 plat.rect.top += max(abs(self.player.vel.y), 2)
@@ -82,6 +81,7 @@ class Game:
             if len(self.platforms) <= 0:
                 self.playing = False
 
+        # 跳板数<5，且player未跌落到屏幕外(否则player跌到屏幕外，仍在不停做碰撞检测，性能开销极大，会把程序卡死)
         while len(self.platforms) <= 5 and self.player.rect.bottom < HEIGHT:
             width = random.randrange(50, 100)
             p = Platform(self, random.randint(0, WIDTH - width),
