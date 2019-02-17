@@ -37,14 +37,21 @@ class Player(pg.sprite.Sprite):
         self.vel += self.acc
         self.pos += self.vel
 
+        if abs(self.vel.x) < 0.5:
+            self.vel.x = 0
+        # if abs(self.vel.y) < 0.5:
+        #     self.vel.y = 0
+
+        print(self.vel.y)
+
         if self.rect.left > WIDTH:
             self.pos.x = 0 - self.width / 2
         if self.rect.right < 0:
             self.pos.x = WIDTH + self.width / 2
 
         # 防止碰撞后的0.5px的上下抖动
-        if math.fabs(self.rect.bottom - self.pos.y) >= 1:
-            self.rect.bottom = self.pos.y
+        # if math.fabs(self.rect.bottom - self.pos.y) >= 1:
+        self.rect.bottom = self.pos.y
         self.rect.x = self.pos.x - self.width / 2
 
 

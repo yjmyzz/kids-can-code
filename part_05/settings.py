@@ -2,7 +2,7 @@
 
 SIZE = WIDTH, HEIGHT = 320, 480
 FPS = 60
-DEBUG = False
+DEBUG = True
 
 TITLE = "Jumpy!"
 

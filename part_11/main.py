@@ -21,7 +21,6 @@ class Game:
         self.load_data()
 
     def load_data(self):
-        # 加载历史最高分
         file_path = path.join(self.dir, HIGH_SCORE_FILE)
         if path.exists(file_path):
             with open(file_path, "r") as f:
@@ -29,7 +28,6 @@ class Game:
                     self.high_score = int(f.read())
                 except:
                     self.high_score = 0
-        # load spritesheet
         self.spritesheet = Spritesheet(path.join(self.dir, SPRITE_SHEET_PNG_FILE),
                                        path.join(self.dir, SPRITE_SHEET_XML_FILE))
 
@@ -68,7 +66,6 @@ class Game:
                 plat.rect.top += abs(self.player.vel.y)
                 if plat.rect.top > HEIGHT:
                     plat.kill()
-                    # 得分+10
                     self.score += 10
         if self.player.rect.bottom > HEIGHT:
             for sprite in self.all_sprites:
@@ -143,7 +140,6 @@ class Game:
         self.draw_text("GAME OVER", 48, WHITE, WIDTH / 2, HEIGHT * 0.4)
         self.draw_text("Score:  " + str(self.score), 22, WHITE, WIDTH / 2, HEIGHT * 0.55)
         self.draw_text("Press a key to play again", 20, WHITE, WIDTH / 2, HEIGHT * 0.7)
-        # 如果得分出现新记录，保存下来
         if self.score > self.high_score:
             self.high_score = self.score
             self.draw_text("New High Score: " + str(self.high_score), 28, WHITE, WIDTH / 2, 25)

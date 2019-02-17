@@ -21,7 +21,6 @@ class Game:
         self.load_data()
 
     def load_data(self):
-        # 加载历史最高分
         file_path = path.join(self.dir, HIGH_SCORE_FILE)
         if path.exists(file_path):
             with open(file_path, "r") as f:
@@ -29,7 +28,6 @@ class Game:
                     self.high_score = int(f.read())
                 except:
                     self.high_score = 0
-        # load spritesheet
         self.spritesheet = Spritesheet(path.join(self.dir, SPRITE_SHEET_PNG_FILE),
                                        path.join(self.dir, SPRITE_SHEET_XML_FILE))
 
@@ -41,7 +39,9 @@ class Game:
         self.all_sprites.add(self.player)
 
         for plat in PLATFORM_LIST:
+            # 这里相应调整
             p = Platform(self, *plat)
+            # 如果platform位置太靠右，跑出屏幕外，校正位置
             if p.rect.right >= WIDTH:
                 p.rect.centerx = p.rect.centerx - (p.rect.right - WIDTH) - 2
             self.all_sprites.add(p)
@@ -65,12 +65,13 @@ class Game:
                 self.player.pos.y = hits[0].rect.top
                 self.player.vel.y = 0
         if self.player.rect.top < HEIGHT / 4:
+            # 如果player正好1/4高度位置的平台上，由于y轴速度为0，
+            # 如果头上的plat正好出现一半，视觉上看上去有点奇怪，所以调整成不低于2px的速度y，这样屏幕会缓缓滚动，直到把platform全露出来
             self.player.pos.y += max(abs(self.player.vel.y), 2)
             for plat in self.platforms:
                 plat.rect.top += max(abs(self.player.vel.y), 2)
                 if plat.rect.top > HEIGHT:
                     plat.kill()
-                    # 得分+10
                     self.score += 10
 
         if self.player.rect.bottom > HEIGHT:
@@ -85,9 +86,11 @@ class Game:
             width = random.randrange(50, 100)
             p = Platform(self, random.randint(0, WIDTH - width),
                          random.randint(-70, -30))
+            # 如果platform位置太靠右，跑出屏幕外，校正位置
             if p.rect.right >= WIDTH:
                 p.rect.centerx = p.rect.centerx - (p.rect.right - WIDTH) - 2
             self.all_sprites.add(p)
+            # 防止二个plat平台叠在一起（原理：用待加入的plat与其它platform实例做碰撞检测，如果碰撞了，则扔掉）
             hits = pg.sprite.spritecollide(p, self.platforms, False)
             if hits:
                 p.kill()

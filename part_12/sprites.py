@@ -12,7 +12,6 @@ class Player(pg.sprite.Sprite):
     def __init__(self, game):
         pg.sprite.Sprite.__init__(self)
         self.game = game
-        # 行走状态
         self.walking = False
         self.jumping = False
         self.current_frame = 0
@@ -21,6 +20,7 @@ class Player(pg.sprite.Sprite):
         self.image = self.standing_frames[0]
 
         self.rect = self.image.get_rect()
+        # 初始化时，停在第一块platform上
         self.rect.center = (35, HEIGHT - 35)
         self.pos = self.rect.center
         self.vel = vec(0, 0)
@@ -42,6 +42,8 @@ class Player(pg.sprite.Sprite):
         hits = pg.sprite.spritecollide(self, self.game.platforms, False)
         if hits:
             self.vel.y = -PLAYER_JUMP
+            if abs(self.vel.x) < 0.5:
+                self.jumping = True
 
     def update(self):
         self.animate()
@@ -60,22 +62,31 @@ class Player(pg.sprite.Sprite):
         if abs(self.vel.x) < 0.5:
             self.vel.x = 0
 
+        if abs(self.vel.y) < 0.5:
+            self.vel.y = 0
+
         if self.rect.left > WIDTH:
             self.pos.x = 0 - self.width / 2
         if self.rect.right < 0:
             self.pos.x = WIDTH + self.width / 2
 
-        # 防止碰撞后的0.5px的上下抖动
         if math.fabs(self.rect.bottom - self.pos.y) >= 1:
             self.rect.bottom = self.pos.y
         self.rect.x = self.pos.x - self.width / 2
 
     def animate(self):
         now = pg.time.get_ticks()
+
         if self.vel.x != 0:
             self.walking = True
         else:
             self.walking = False
+
+        if abs(self.vel.y) < 0.5:
+            self.jumping = False
+
+        if self.jumping:
+            self.image = self.jump_frame
 
         if self.walking:
             if now - self.last_update > 150:
@@ -103,8 +114,10 @@ class Platform(pg.sprite.Sprite):
     def __init__(self, game, x, y):
         pg.sprite.Sprite.__init__(self)
         self.game = game
+        # 改成加载图片
         images = [self.game.spritesheet.get_image("ground_grass_broken.png"),
                   self.game.spritesheet.get_image("ground_grass_small_broken.png")]
+        # 随机选一张
         self.image = random.choice(images)
         self.rect = self.image.get_rect()
         self.rect.x = x

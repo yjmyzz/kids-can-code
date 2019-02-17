@@ -11,7 +11,6 @@ class Player(pg.sprite.Sprite):
     def __init__(self, game):
         pg.sprite.Sprite.__init__(self)
         self.game = game
-        # 行走状态
         self.walking = False
         self.jumping = False
         self.current_frame = 0
@@ -41,6 +40,10 @@ class Player(pg.sprite.Sprite):
         hits = pg.sprite.spritecollide(self, self.game.platforms, False)
         if hits:
             self.vel.y = -PLAYER_JUMP
+            # 水平方向未走动时，才认为是向上跳跃状态
+            # (否则，如果向上跳时，同时按左右方向键，不会切换到向左或向右的转向动画）
+            if abs(self.vel.x) < 0.5:
+                self.jumping = True
 
     def update(self):
         self.animate()
@@ -59,31 +62,47 @@ class Player(pg.sprite.Sprite):
         if abs(self.vel.x) < 0.5:
             self.vel.x = 0
 
+        if abs(self.vel.y) < 0.5:
+            self.vel.y = 0
+
         if self.rect.left > WIDTH:
             self.pos.x = 0 - self.width / 2
         if self.rect.right < 0:
             self.pos.x = WIDTH + self.width / 2
 
-        # 防止碰撞后的0.5px的上下抖动
         if math.fabs(self.rect.bottom - self.pos.y) >= 1:
             self.rect.bottom = self.pos.y
         self.rect.x = self.pos.x - self.width / 2
 
     def animate(self):
         now = pg.time.get_ticks()
+
         if self.vel.x != 0:
             self.walking = True
         else:
             self.walking = False
 
+        # 如果垂直方向静止，或水平方向有走动时，认为向上跳跃状态结束
+        if abs(self.vel.y) < 0.5 or abs(self.vel.x) > 0.5:
+            self.jumping = False
+
+        if self.jumping:
+            self.image = self.jump_frame
+        # 下面的不再需要了，否则左右走动时，会变成站立状态
+        # else:
+        #     self.image = self.standing_frames[0]
+
+        # 水平向左/向右走的动画处理
         if self.walking:
             if now - self.last_update > 150:
                 self.last_update = now
                 self.current_frame += 1
                 bottom = self.rect.bottom
+                # 向左
                 if self.vel.x < 0:
                     self.image = self.walking_frames_left[self.current_frame % len(self.walking_frames_left)]
                 elif self.vel.x > 0:
+                    # 向右
                     self.image = self.walking_frames_right[self.current_frame % len(self.walking_frames_right)]
                 self.rect = self.image.get_rect()
                 self.rect.bottom = bottom
