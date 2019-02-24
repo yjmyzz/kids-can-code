@@ -39,9 +39,7 @@ class Game:
         self.all_sprites.add(self.player)
 
         for plat in PLATFORM_LIST:
-            # 这里相应调整
             p = Platform(self, *plat)
-            # 如果platform位置太靠右，跑出屏幕外，校正位置
             if p.rect.right >= WIDTH:
                 p.rect.centerx = p.rect.centerx - (p.rect.right - WIDTH) - 2
             self.all_sprites.add(p)
@@ -62,17 +60,19 @@ class Game:
         if self.player.vel.y > 0:
             hits = pg.sprite.spritecollide(self.player, self.platforms, False)
             if hits:
-                # self.player.pos.y = hits[0].rect.top
-                # self.player.vel.y = 0
+                # 当player向上同时碰撞到多个跳板(注：跳板之间挨得很近时，容易出现这种情况)
+                # 找出最低的那块，让player落上最低的跳板上
                 lowest = hits[0]
                 for hit in hits:
                     if hit.rect.bottom > lowest.rect.bottom:
                         lowest = hit
                 if self.player.pos.y < lowest.rect.centery:
-                    self.player.pos.y = lowest.rect.top
-                    self.player.vel.y = 0
+                    # fix 走到跳板最边缘时，仍挂在半空中，不掉下去
+                    if lowest.rect.right + 10 >= self.player.rect.centerx >= lowest.rect.left - 10:
+                        self.player.pos.y = lowest.rect.top
+                        self.player.vel.y = 0
         if self.player.rect.top < HEIGHT / 4:
-            # 防止垂直方向速度为0时，无法滚动屏幕
+
             self.player.pos.y += max(abs(self.player.vel.y), 2)
             for plat in self.platforms:
                 plat.rect.top += max(abs(self.player.vel.y), 2)
@@ -88,16 +88,13 @@ class Game:
             if len(self.platforms) <= 0:
                 self.playing = False
 
-        # 跳板数<5，且player未跌落到屏幕外(否则player跌到屏幕外，仍在不停做碰撞检测，性能开销极大，会把程序卡死)
         while len(self.platforms) <= 5 and self.player.rect.bottom < HEIGHT:
             width = random.randrange(50, 100)
             p = Platform(self, random.randint(0, WIDTH - width),
                          random.randint(-70, -30))
-            # 如果platform位置太靠右，跑出屏幕外，校正位置
             if p.rect.right >= WIDTH:
                 p.rect.centerx = p.rect.centerx - (p.rect.right - WIDTH) - 2
             self.all_sprites.add(p)
-            # 防止二个plat平台叠在一起（原理：用待加入的plat与其它platform实例做碰撞检测，如果碰撞了，则扔掉）
             hits = pg.sprite.spritecollide(p, self.platforms, False)
             if hits:
                 p.kill()
@@ -139,7 +136,7 @@ class Game:
         self.wait_for_key()
 
     def draw(self):
-        self.screen.fill(BLACK)
+        self.screen.fill(LIGHT_BLUE)
         self.all_sprites.draw(self.screen)
         self.debug()
         self.draw_text(str(self.score), 22, WHITE, WIDTH / 2, 15)
@@ -162,7 +159,6 @@ class Game:
         self.draw_text("GAME OVER", 48, WHITE, WIDTH / 2, HEIGHT * 0.4)
         self.draw_text("Score:  " + str(self.score), 22, WHITE, WIDTH / 2, HEIGHT * 0.55)
         self.draw_text("Press a key to play again", 20, WHITE, WIDTH / 2, HEIGHT * 0.7)
-        # 如果得分出现新记录，保存下来
         if self.score > self.high_score:
             self.high_score = self.score
             self.draw_text("New High Score: " + str(self.high_score), 28, WHITE, WIDTH / 2, 25)
