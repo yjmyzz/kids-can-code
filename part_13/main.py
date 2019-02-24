@@ -68,7 +68,7 @@ class Game:
                         lowest = hit
                 if self.player.pos.y < lowest.rect.centery:
                     # fix 走到跳板最边缘时，仍挂在半空中，不掉下去
-                    if lowest.rect.right + 10 >= self.player.rect.centerx >= lowest.rect.left - 10:
+                    if lowest.rect.right + 5 >= self.player.rect.centerx >= lowest.rect.left - 5:
                         self.player.pos.y = lowest.rect.top
                         self.player.vel.y = 0
         if self.player.rect.top < HEIGHT / 4:
