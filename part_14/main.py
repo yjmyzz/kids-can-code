@@ -1,5 +1,5 @@
-from part_13.sprites import *
-from part_13.settings import *
+from part_14.sprites import *
+from part_14.settings import *
 import random
 from os import path
 

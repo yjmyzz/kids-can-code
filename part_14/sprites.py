@@ -1,5 +1,5 @@
 # https://opengameart.org/content/jumper-pack
-from part_13.settings import *
+from part_14.settings import *
 import pygame as pg
 import math
 from xml.dom.minidom import parse
