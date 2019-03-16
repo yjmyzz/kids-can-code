@@ -31,6 +31,11 @@ class Game:
         self.spritesheet = Spritesheet(path.join(self.dir, SPRITE_SHEET_PNG_FILE),
                                        path.join(self.dir, SPRITE_SHEET_XML_FILE))
 
+        # 设置声音目录
+        # 声音素材，可通过https://www.bfxr.net/获取
+        self.snd_dir = path.join(self.dir, "../snd")
+        self.jump_sound = pg.mixer.Sound(path.join(self.snd_dir, "Jump.wav"))
+
     def new(self):
         self.score = 0
         self.all_sprites = pg.sprite.Group()
@@ -44,16 +49,21 @@ class Game:
                 p.rect.centerx = p.rect.centerx - (p.rect.right - WIDTH) - 2
             self.all_sprites.add(p)
             self.platforms.add(p)
-
+        # 加载背景音乐
+        pg.mixer.music.load(path.join(self.snd_dir, "bgm.mp3"))
         self.run()
 
     def run(self):
+        # 循环播放背景音乐
+        pg.mixer.music.play(-1)
         self.playing = True
         while self.playing:
             self.clock.tick(FPS)
             self.events()
             self.update()
             self.draw()
+        # game over时背景音乐淡出
+        pg.mixer.music.fadeout(500)
 
     def update(self):
         self.all_sprites.update()
@@ -68,7 +78,6 @@ class Game:
                     if lowest.rect.right + 5 >= self.player.rect.centerx >= lowest.rect.left - 5:
                         self.player.pos.y = lowest.rect.top
                         self.player.vel.y = 0
-                        # 停下后，修改状态位
                         self.player.jumping = False
 
         if self.player.rect.top < HEIGHT / 4:
@@ -110,7 +119,6 @@ class Game:
             if event.type == pg.KEYDOWN:
                 if event.key == pg.K_SPACE:
                     self.player.jump()
-            # 按键松开时，强行中断跳跃
             if event.type == pg.KEYUP:
                 if event.key == pg.K_SPACE:
                     self.player.jump_cut()
@@ -131,6 +139,8 @@ class Game:
             pg.draw.line(self.screen, WHITE, (WIDTH / 2, 0), (WIDTH / 2, HEIGHT), 1)
 
     def show_start_screen(self):
+        pg.mixer.music.load(path.join(self.snd_dir, "start_and_go.ogg"))
+        pg.mixer.music.play(-1)
         self.screen.fill(BG_COLOR)
         self.draw_text(TITLE, 48, WHITE, WIDTH / 2, HEIGHT * 0.4)
         self.draw_text("Arrows to move, Space to jump", 22, WHITE, WIDTH / 2, HEIGHT * 0.55)
@@ -138,6 +148,7 @@ class Game:
         self.draw_text("High Score: " + str(self.high_score), 20, WHITE, WIDTH / 2, 15)
         pg.display.update()
         self.wait_for_key()
+        pg.mixer.music.fadeout(500)
 
     def draw(self):
         self.screen.fill(LIGHT_BLUE)
@@ -159,6 +170,8 @@ class Game:
                     waiting = False
 
     def show_go_screen(self):
+        pg.mixer.music.load(path.join(self.snd_dir, "start_and_go.ogg"))
+        pg.mixer.music.play(-1)
         self.screen.fill(BG_COLOR)
         self.draw_text("GAME OVER", 48, WHITE, WIDTH / 2, HEIGHT * 0.4)
         self.draw_text("Score:  " + str(self.score), 22, WHITE, WIDTH / 2, HEIGHT * 0.55)
@@ -173,6 +186,7 @@ class Game:
 
         pg.display.update()
         self.wait_for_key()
+        pg.mixer.music.fadeout(500)
 
     def draw_text(self, text, size, color, x, y):
         font = pg.font.SysFont(self.font_name, size)

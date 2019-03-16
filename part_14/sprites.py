@@ -40,13 +40,17 @@ class Player(pg.sprite.Sprite):
 
     def jump_cut(self):
         if self.jumping:
+            if self.vel.y < -3:
+                self.vel.y = -3
             # 给1个很小的正向速度，让其下降
-            self.vel.y = 1
+            # self.vel.y = 1
 
     def jump(self):
         hits = pg.sprite.spritecollide(self, self.game.platforms, False)
         # 加入状态位判断
         if hits and not self.jumping:
+            # 播放声音
+            self.game.jump_sound.play()
             self.vel.y = -PLAYER_JUMP
             if abs(self.vel.x) < 0.5:
                 self.jumping = True
