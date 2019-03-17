@@ -1,5 +1,5 @@
-from part_14.sprites import *
-from part_14.settings import *
+from part_15.sprites import *
+from part_15.settings import *
 import random
 from os import path
 
@@ -31,15 +31,17 @@ class Game:
         self.spritesheet = Spritesheet(path.join(self.dir, SPRITE_SHEET_PNG_FILE),
                                        path.join(self.dir, SPRITE_SHEET_XML_FILE))
 
-        # 设置声音目录
-        # 声音素材，可通过https://www.bfxr.net/获取
         self.snd_dir = path.join(self.dir, "../snd")
         self.jump_sound = pg.mixer.Sound(path.join(self.snd_dir, "jump.wav"))
+        # 加载power-up音效
+        self.boost_sound = pg.mixer.Sound(path.join(self.snd_dir, "power_up.wav"))
 
     def new(self):
         self.score = 0
         self.all_sprites = pg.sprite.Group()
         self.platforms = pg.sprite.Group()
+        # 定义 power-up group
+        self.powerups = pg.sprite.Group()
         self.player = Player(self)
         self.all_sprites.add(self.player)
 
@@ -49,12 +51,11 @@ class Game:
                 p.rect.centerx = p.rect.centerx - (p.rect.right - WIDTH) - 2
             self.all_sprites.add(p)
             self.platforms.add(p)
-        # 加载背景音乐
+
         pg.mixer.music.load(path.join(self.snd_dir, "bgm.mp3"))
         self.run()
 
     def run(self):
-        # 循环播放背景音乐
         pg.mixer.music.play(-1)
         self.playing = True
         while self.playing:
@@ -62,7 +63,6 @@ class Game:
             self.events()
             self.update()
             self.draw()
-        # game over时背景音乐淡出
         pg.mixer.music.fadeout(500)
 
     def update(self):
@@ -81,13 +81,19 @@ class Game:
                         self.player.jumping = False
 
         if self.player.rect.top < HEIGHT / 4:
-
             self.player.pos.y += max(abs(self.player.vel.y), 2)
             for plat in self.platforms:
                 plat.rect.top += max(abs(self.player.vel.y), 2)
                 if plat.rect.top > HEIGHT:
                     plat.kill()
                     self.score += 10
+
+        # 检测power up碰撞
+        pow_hits = pg.sprite.spritecollide(self.player, self.powerups, True)
+        for _ in pow_hits:
+            self.boost_sound.play()
+            self.player.vel.y = -BOOST_POWER
+            self.player.jumping = False
 
         if self.player.rect.bottom > HEIGHT:
             for sprite in self.all_sprites:
@@ -149,7 +155,6 @@ class Game:
         self.draw_text("High Score: " + str(self.high_score), 20, WHITE, WIDTH / 2, 15)
         pg.display.update()
         self.wait_for_key()
-        # 有按键开始时，淡出背景音
         pg.mixer.music.fadeout(500)
 
     def draw(self):
@@ -172,7 +177,6 @@ class Game:
                     waiting = False
 
     def show_go_screen(self):
-        # 启动界面播放背景音乐
         pg.mixer.music.load(path.join(self.snd_dir, "start_and_go.ogg"))
         pg.mixer.music.play(-1)
         self.screen.fill(BG_COLOR)
@@ -189,7 +193,6 @@ class Game:
 
         pg.display.update()
         self.wait_for_key()
-        # 有按键开始时，淡出背景音
         pg.mixer.music.fadeout(500)
 
     def draw_text(self, text, size, color, x, y):
