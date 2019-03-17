@@ -139,6 +139,7 @@ class Game:
             pg.draw.line(self.screen, WHITE, (WIDTH / 2, 0), (WIDTH / 2, HEIGHT), 1)
 
     def show_start_screen(self):
+        # 启动界面播放背景音乐
         pg.mixer.music.load(path.join(self.snd_dir, "start_and_go.ogg"))
         pg.mixer.music.play(-1)
         self.screen.fill(BG_COLOR)
@@ -148,6 +149,7 @@ class Game:
         self.draw_text("High Score: " + str(self.high_score), 20, WHITE, WIDTH / 2, 15)
         pg.display.update()
         self.wait_for_key()
+        # 有按键开始时，淡出背景音
         pg.mixer.music.fadeout(500)
 
     def draw(self):
@@ -170,6 +172,7 @@ class Game:
                     waiting = False
 
     def show_go_screen(self):
+        # 启动界面播放背景音乐
         pg.mixer.music.load(path.join(self.snd_dir, "start_and_go.ogg"))
         pg.mixer.music.play(-1)
         self.screen.fill(BG_COLOR)
@@ -186,6 +189,7 @@ class Game:
 
         pg.display.update()
         self.wait_for_key()
+        # 有按键开始时，淡出背景音
         pg.mixer.music.fadeout(500)
 
     def draw_text(self, text, size, color, x, y):

@@ -20,7 +20,6 @@ class Player(pg.sprite.Sprite):
         self.image = self.standing_frames[0]
 
         self.rect = self.image.get_rect()
-        # 初始化时，停在第一块platform上
         self.rect.center = (35, HEIGHT - 35)
         self.pos = self.rect.center
         self.vel = vec(0, 0)
@@ -42,12 +41,9 @@ class Player(pg.sprite.Sprite):
         if self.jumping:
             if self.vel.y < -3:
                 self.vel.y = -3
-            # 给1个很小的正向速度，让其下降
-            # self.vel.y = 1
 
     def jump(self):
         hits = pg.sprite.spritecollide(self, self.game.platforms, False)
-        # 加入状态位判断
         if hits and not self.jumping:
             # 播放声音
             self.game.jump_sound.play()
@@ -127,8 +123,6 @@ class Platform(pg.sprite.Sprite):
         images = [self.game.spritesheet.get_image("ground_grass_broken.png"),
                   self.game.spritesheet.get_image("ground_grass_small_broken.png")]
         self.image = random.choice(images)
-        # 临时改成只使用长的跳板
-        # self.image = images[0]
         self.rect = self.image.get_rect()
         self.rect.x = x
         self.rect.y = y
