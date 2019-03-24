@@ -1,5 +1,5 @@
-from part_16.sprites import *
-from part_16.settings import *
+from part_17.sprites import *
+from part_17.settings import *
 import random
 from os import path
 
@@ -37,14 +37,11 @@ class Game:
 
     def new(self):
         self.score = 0
-        # 这里换成LayeredUpdates为了体现"分层"效果
         self.all_sprites = pg.sprite.LayeredUpdates()
         self.platforms = pg.sprite.Group()
         self.powerups = pg.sprite.Group()
-        # 敌人的分组
         self.mobs = pg.sprite.Group()
         self.player = Player(self)
-        # 指定分层
         self.all_sprites.add(self.player, layer=PLAYER_LAYER)
         self.mob_timer = 0
 
@@ -52,7 +49,6 @@ class Game:
             p = Platform(self, *plat)
             if p.rect.right >= WIDTH:
                 p.rect.centerx = p.rect.centerx - (p.rect.right - WIDTH) - 2
-            # 指定分层
             self.all_sprites.add(p, layer=PLATFORM_LAYER)
             self.platforms.add(p)
 
@@ -72,17 +68,15 @@ class Game:
     def update(self):
         self.all_sprites.update()
 
-        # 每隔一定时间，随机加入敌人
         now = pg.time.get_ticks()
         if now - self.mob_timer > MOB_FREQ + random.choice([-1000, -500, 0, 500, 1000]):
             self.mob_timer = now
             mob = Mob(self)
-            # 指定分层
             self.all_sprites.add(mob, layer=MOB_LAYER)
             self.mobs.add(mob)
 
         # 与敌人的碰撞检测
-        mob_hits = pg.sprite.spritecollide(self.player, self.mobs, False)
+        mob_hits = pg.sprite.spritecollide(self.player, self.mobs, False, pg.sprite.collide_rect_ratio(0.85))
         if mob_hits:
             self.playing = False
 
@@ -101,7 +95,6 @@ class Game:
 
         if self.player.rect.top < HEIGHT / 4:
             self.player.pos.y += max(abs(self.player.vel.y), 2)
-            # 屏幕滚动时，敌人也要相应的滚动
             for mob in self.mobs:
                 mob.rect.top += max(abs(self.player.vel.y), 2)
                 if mob.rect.top > HEIGHT:
@@ -132,7 +125,6 @@ class Game:
                          random.randint(-70, -30))
             if p.rect.right >= WIDTH:
                 p.rect.centerx = p.rect.centerx - (p.rect.right - WIDTH) - 2
-            # 分层
             self.all_sprites.add(p, layer=PLATFORM_LAYER)
             hits = pg.sprite.spritecollide(p, self.platforms, False)
             if hits:
@@ -169,7 +161,6 @@ class Game:
             pg.draw.line(self.screen, WHITE, (WIDTH / 2, 0), (WIDTH / 2, HEIGHT), 1)
 
     def show_start_screen(self):
-        # 启动界面播放背景音乐
         pg.mixer.music.load(path.join(self.snd_dir, "start_and_go.ogg"))
         pg.mixer.music.play(-1)
         self.screen.fill(BG_COLOR)

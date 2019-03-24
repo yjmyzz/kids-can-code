@@ -1,5 +1,5 @@
 # https://opengameart.org/content/jumper-pack
-from part_16.settings import *
+from part_17.settings import *
 import pygame as pg
 import math
 from xml.dom.minidom import parse
@@ -10,7 +10,6 @@ vec = pg.math.Vector2
 
 class Player(pg.sprite.Sprite):
     def __init__(self, game):
-
         pg.sprite.Sprite.__init__(self)
         self.game = game
         self.walking = False
@@ -46,7 +45,6 @@ class Player(pg.sprite.Sprite):
     def jump(self):
         hits = pg.sprite.spritecollide(self, self.game.platforms, False)
         if hits and not self.jumping:
-            # 播放声音
             self.game.jump_sound.play()
             self.vel.y = -PLAYER_JUMP
             if abs(self.vel.x) < 0.5:
@@ -80,6 +78,8 @@ class Player(pg.sprite.Sprite):
         if math.fabs(self.rect.bottom - self.pos.y) >= 1:
             self.rect.bottom = self.pos.y
         self.rect.x = self.pos.x - self.width / 2
+
+
 
     def animate(self):
         now = pg.time.get_ticks()
@@ -116,6 +116,9 @@ class Player(pg.sprite.Sprite):
                 self.rect = self.image.get_rect()
                 self.rect.bottom = bottom
 
+        # 加上mask
+        self.mask = pg.mask.from_surface(self.image)
+
 
 class Platform(pg.sprite.Sprite):
     def __init__(self, game, x, y):
@@ -129,7 +132,6 @@ class Platform(pg.sprite.Sprite):
         self.rect.y = y
         if random.randrange(100) < BOOST_POWER_PERCENT:
             power = PowerUp(self.game, self)
-            # 加速器加入分层
             self.game.all_sprites.add(power, layer=POWERUP_LAYER)
             self.game.powerups.add(power)
 
@@ -165,7 +167,6 @@ class PowerUp(pg.sprite.Sprite):
             self.rect.centerx = self.plat.rect.centerx
 
 
-# 敌人类
 class Mob(pg.sprite.Sprite):
     def __init__(self, game):
         pg.sprite.Sprite.__init__(self)
@@ -187,7 +188,6 @@ class Mob(pg.sprite.Sprite):
     def update(self):
         self.rect.x += self.vx
         self.vy += self.dy
-        # 敌人上下移动
         if abs(self.vy) > 3:
             self.dy *= -1
         center = self.rect.center
@@ -198,9 +198,11 @@ class Mob(pg.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.center = center
         self.rect.y += self.vy
-        # 超出边界自动清除资源
         if self.rect.left > WIDTH + 100 or self.rect.right < -100:
             self.kill()
+
+        # 加上mask
+        self.mask = pg.mask.from_surface(self.image)
 
 
 class Spritesheet:
@@ -230,5 +232,5 @@ class Spritesheet:
         image = pg.Surface((rect.width, rect.height))
         image.blit(self.sprite_sheet, (0, 0), rect)
         image = pg.transform.scale(image, (rect.width // scale, rect.height // scale))
-        image.set_colorkey(BLACK, 1)
+        image.set_colorkey(BLACK)
         return image
