@@ -25,7 +25,6 @@ sub_textures = root_textures.getElementsByTagName("SubTexture")
 dic_image = {}
 
 
-# 解析xml，找出指定图片的坐标、尺寸信息
 def get_image_rect(img_name):
     if dic_image.get(img_name):
         return dic_image[img_name]
@@ -56,6 +55,7 @@ class Demo(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.x = pos[0]
         self.rect.y = pos[1]
+        # 指定蒙版
         self.mask = pygame.mask.from_surface(self.image)
 
 
@@ -98,9 +98,7 @@ while running:
 
     font = pygame.font.SysFont("Menlo", 25, True)
 
-    # if pygame.sprite.spritecollide(demo1, group2, False, pygame.sprite.collide_circle):
-    # if pygame.sprite.spritecollide(demo1, group2, False, pygame.sprite.collide_rect_ratio(0.9)):
-    # if pygame.sprite.spritecollide(demo1, group2, False, pygame.sprite.collide_rect):
+    # 基于mask的检测
     if pygame.sprite.spritecollide(demo1, group2, False, pygame.sprite.collide_mask):
         pos_txt = font.render("hit:true", 1, (255, 255, 128))
     else:

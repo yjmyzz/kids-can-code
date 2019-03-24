@@ -18,7 +18,7 @@ class Player(pg.sprite.Sprite):
         self.last_update = 0
         self.load_images()
         self.image = self.standing_frames[0]
-
+        self.mask = pg.mask.from_surface(self.image)
         self.rect = self.image.get_rect()
         self.rect.center = (35, HEIGHT - 35)
         self.pos = self.rect.center
@@ -78,8 +78,6 @@ class Player(pg.sprite.Sprite):
         if math.fabs(self.rect.bottom - self.pos.y) >= 1:
             self.rect.bottom = self.pos.y
         self.rect.x = self.pos.x - self.width / 2
-
-
 
     def animate(self):
         now = pg.time.get_ticks()
@@ -176,6 +174,7 @@ class Mob(pg.sprite.Sprite):
         self.image_up = self.game.spritesheet.get_image("flyMan_fly.png")
         self.image_down = self.game.spritesheet.get_image("flyMan_jump.png")
         self.image = self.image_up
+        self.mask = pg.mask.from_surface(self.image)
         self.rect = self.image.get_rect()
         self.rect.centerx = random.choice([-100, WIDTH + 100])
         self.vx = random.randrange(1, 4)
@@ -195,14 +194,13 @@ class Mob(pg.sprite.Sprite):
             self.image = self.image_up
         else:
             self.image = self.image_down
+        # 加上mask
+        self.mask = pg.mask.from_surface(self.image)
         self.rect = self.image.get_rect()
         self.rect.center = center
         self.rect.y += self.vy
         if self.rect.left > WIDTH + 100 or self.rect.right < -100:
             self.kill()
-
-        # 加上mask
-        self.mask = pg.mask.from_surface(self.image)
 
 
 class Spritesheet:
