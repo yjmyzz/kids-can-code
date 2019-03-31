@@ -54,7 +54,7 @@ class Game:
             self.platforms.add(p)
 
         # 初始化生成白云
-        for i in range(2, 6):
+        for i in range(2, 4):
             scale = random.choice([2.5, 3.0, 3.5, 4.0, 4.5])
             c = Cloud(self, random.randrange(0, WIDTH), random.randrange(-100, HEIGHT), scale)
             self.all_sprites.add(c, layer=CLOUD_LAYER)
@@ -145,7 +145,7 @@ class Game:
                 self.platforms.add(p)
 
         # cloud不够时，自动补充
-        while len(self.clouds) <= 5 and self.player.rect.bottom < HEIGHT:
+        while len(self.clouds) <= 3 and self.player.rect.bottom < HEIGHT:
             scale = random.choice([2.5, 3.0, 3.5, 4.0, 4.5])
             c = Cloud(self, random.randrange(0, WIDTH), random.randrange(-200, -50), scale)
             self.all_sprites.add(c, layer=CLOUD_LAYER)
